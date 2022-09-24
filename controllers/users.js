@@ -53,6 +53,15 @@ module.exports.login = (req, res, next) => {
     .catch(next);
 };
 
+module.exports.getUserInfo = (req, res, next) => {
+  User.findById(req.user._id)
+    .then((user) => {
+      res.status(200).send(user);
+    })
+
+    .catch(next);
+};
+
 module.exports.updateUserInfo = (req, res, next) => {
   const { email, name } = req.body;
 
@@ -61,7 +70,7 @@ module.exports.updateUserInfo = (req, res, next) => {
     runValidators: true,
   })
     .then((user) => {
-      req.status(200).send(user);
+      res.status(200).send(user);
     })
 
     .catch(next);
