@@ -7,17 +7,14 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const { errors } = require('celebrate');
 
-const userRouter = require('./routes/users');
-const movieRouter = require('./routes/movies');
+const router = require('./routes/index');
 
-const { createUser, login } = require('./controllers/users');
-
-const auth = require('./middlewares/auth');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const { validateUserCreation, validateLogin } = require('./middlewares/validations');
+const cors = require('./middlewares/cors');
+const limiter = require('./middlewares/rateLimiter');
 
-const { SERVER_PORT, OK, SERVER_ERROR } = require('./utils/constants');
-const NotFoundError = require('./errors/NotFoundError');
+const { SERVER_PORT } = require('./utils/constants');
+const centralHandlerErrors = require('./utils/centralHandlerErrors');
 
 const app = express();
 
@@ -27,38 +24,19 @@ mongoose.connect('mongodb://localhost:27017/bitfilmsdb', {
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use('*', cors);
 
 app.use(requestLogger);
 
 app.use(cookieParser());
 
-app.post('/signup', validateUserCreation, createUser);
-app.post('/signin', validateLogin, login);
-app.get('/signout', (req, res) => {
-  res.clearCookie('jwt').status(OK).send({ message: 'Выход' });
-});
-
-app.use('/', auth);
-app.use('/users', userRouter);
-app.use('/movies', movieRouter);
-
-app.use('*', (req, res, next) => {
-  next(new NotFoundError('Запрашиваемая страница не найдена'));
-});
+app.use('/', limiter, router);
 
 app.use(errorLogger);
 
 app.use(errors());
 
-app.use((err, req, res, next) => {
-  if (err.statusCode) {
-    res.status(err.statusCode).send({ message: err.message });
-  } else {
-    res.status(SERVER_ERROR).send({ message: 'Произошла ошибка' });
-  }
-
-  next();
-});
+app.use(centralHandlerErrors);
 
 app.listen(SERVER_PORT, () => {
   console.log(`its my server on port ${SERVER_PORT}`);
