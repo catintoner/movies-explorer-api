@@ -13,6 +13,7 @@ const { createUser, login } = require('./controllers/users');
 
 const auth = require('./middlewares/auth');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const { validateUserCreation, validateLogin } = require('./middlewares/validations');
 
 const { SERVER_PORT, OK } = require('./utils/constants');
 
@@ -29,8 +30,8 @@ app.use(requestLogger);
 
 app.use(cookieParser());
 
-app.post('/signup', createUser);
-app.post('/signin', login);
+app.post('/signup', validateUserCreation, createUser);
+app.post('/signin', validateLogin, login);
 app.get('/signout', (req, res) => {
   res.clearCookie('jwt').status(OK).send({ message: 'Выход' });
 });

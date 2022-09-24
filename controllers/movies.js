@@ -3,7 +3,8 @@ const Movie = require('../models/movie');
 const { OK, CREATED_CODE } = require('../utils/constants');
 
 module.exports.getMovies = (req, res, next) => {
-  Movie.find({})
+  const userId = req.user._id;
+  Movie.find({ owner: userId })
     .then((movies) => {
       res.status(OK).send(movies);
     })
