@@ -8,6 +8,7 @@ const isValidityUrl = /^https?:\/\/(www\.)?[\w\d]*\.([\S\w._~:?#[\]@!$&'()*+,;=\
 
 const OK = 200;
 const CREATED_CODE = 201;
+const SERVER_ERROR = 500;
 
 module.exports = {
   JWT,
@@ -15,4 +16,5 @@ module.exports = {
   isValidityUrl,
   OK,
   CREATED_CODE,
+  SERVER_ERROR,
 };

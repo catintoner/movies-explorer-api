@@ -4,12 +4,16 @@ const jwt = require('jsonwebtoken');
 
 const User = require('../models/user');
 
+const UniqueEmailError = require('../errors/UniqueEmailError');
+const ValidateError = require('../errors/ValidateError');
+
 const {
   JWT,
   isProduction,
   CREATED_CODE,
   OK,
 } = require('../utils/constants');
+const NotFoundError = require('../errors/NotFoundError');
 
 module.exports.createUser = (req, res, next) => {
   bcrypt.hash(req.body.password, 10)
@@ -25,7 +29,18 @@ module.exports.createUser = (req, res, next) => {
           res.status(CREATED_CODE).send(user);
         })
 
-        .catch(next);
+        .catch((err) => {
+          if (err.code === 11000) {
+            next(new UniqueEmailError('Пользователь с таким Email уже существует'));
+            return;
+          }
+
+          if (err.name === 'ValidationError') {
+            next(new ValidateError('Указанные данные не корректны'));
+          } else {
+            next(err);
+          }
+        });
     })
 
     .catch(next);
@@ -57,6 +72,7 @@ module.exports.login = (req, res, next) => {
 
 module.exports.getUserInfo = (req, res, next) => {
   User.findById(req.user._id)
+    .orFail(new NotFoundError('Пользователь не найден'))
     .then((user) => {
       res.status(OK).send(user);
     })
@@ -71,9 +87,22 @@ module.exports.updateUserInfo = (req, res, next) => {
     new: true,
     runValidators: true,
   })
+    .orFail(new NotFoundError('Пользователь не найден'))
+
     .then((user) => {
       res.status(OK).send(user);
     })
 
-    .catch(next);
+    .catch((err) => {
+      if (err.code === 11000) {
+        next(new UniqueEmailError('Пользователь с таким Email уже существует'));
+        return;
+      }
+
+      if (err.name === 'ValidationError') {
+        next(new ValidateError('Указанные данные не корректны'));
+      } else {
+        next(err);
+      }
+    });
 };

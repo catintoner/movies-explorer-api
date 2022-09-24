@@ -5,6 +5,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const { errors } = require('celebrate');
 
 const userRouter = require('./routes/users');
 const movieRouter = require('./routes/movies');
@@ -15,7 +16,8 @@ const auth = require('./middlewares/auth');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { validateUserCreation, validateLogin } = require('./middlewares/validations');
 
-const { SERVER_PORT, OK } = require('./utils/constants');
+const { SERVER_PORT, OK, SERVER_ERROR } = require('./utils/constants');
+const NotFoundError = require('./errors/NotFoundError');
 
 const app = express();
 
@@ -41,10 +43,22 @@ app.use('/users', userRouter);
 app.use('/movies', movieRouter);
 
 app.use('*', (req, res, next) => {
-  next(new Error('Запрашиваемая страница не найдена'));
+  next(new NotFoundError('Запрашиваемая страница не найдена'));
 });
 
 app.use(errorLogger);
+
+app.use(errors());
+
+app.use((err, req, res, next) => {
+  if (err.statusCode) {
+    res.status(err.statusCode).send({ message: err.message });
+  } else {
+    res.status(SERVER_ERROR).send({ message: 'Произошла ошибка' });
+  }
+
+  next();
+});
 
 app.listen(SERVER_PORT, () => {
   console.log(`its my server on port ${SERVER_PORT}`);

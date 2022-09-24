@@ -2,6 +2,10 @@ const Movie = require('../models/movie');
 
 const { OK, CREATED_CODE } = require('../utils/constants');
 
+const ValidateError = require('../errors/ValidateError');
+const DeleteForeignMovie = require('../errors/DeleteForeignMovie');
+const NotFoundError = require('../errors/NotFoundError');
+
 module.exports.getMovies = (req, res, next) => {
   const userId = req.user._id;
   Movie.find({ owner: userId })
@@ -47,11 +51,19 @@ module.exports.createMovie = (req, res, next) => {
       res.status(CREATED_CODE).send(movie);
     })
 
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new ValidateError('Указанные данные не корректны'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 module.exports.deleteMovie = (req, res, next) => {
   Movie.findById(req.params.movieId)
+    .orFail(new NotFoundError('Данный фильм не найден'))
+
     .then((movie) => {
       const ownerId = movie.owner.toString();
 
@@ -63,9 +75,15 @@ module.exports.deleteMovie = (req, res, next) => {
 
           .catch(next);
       } else {
-        throw new Error('Нет прав для удаления фильма');
+        throw new DeleteForeignMovie('Нет прав для удаления фильма');
       }
     })
 
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new ValidateError('Указанные данные не корректны'));
+      } else {
+        next(err);
+      }
+    });
 };
