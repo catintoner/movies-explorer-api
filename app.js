@@ -13,7 +13,7 @@ const { createUser, login } = require('./controllers/users');
 
 const auth = require('./middlewares/auth');
 
-const { SERVER_PORT } = require('./utils/constants');
+const { SERVER_PORT, OK } = require('./utils/constants');
 
 const app = express();
 
@@ -29,12 +29,12 @@ app.use(cookieParser());
 app.post('/signup', createUser);
 app.post('/signin', login);
 app.get('/signout', (req, res) => {
-  res.clearCookie('jwt').status(200).send({ message: 'Выход' });
+  res.clearCookie('jwt').status(OK).send({ message: 'Выход' });
 });
 
 app.use('/', auth);
 app.use('/users', userRouter);
-app.use('./movies', movieRouter);
+app.use('/movies', movieRouter);
 
 app.listen(SERVER_PORT, () => {
   console.log(`its my server on port ${SERVER_PORT}`);

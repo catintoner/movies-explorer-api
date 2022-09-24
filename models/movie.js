@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const isValidityUrl = require('../utils/constants');
+const { isValidityUrl } = require('../utils/constants');
 
 const movieSchema = new mongoose.Schema({
 
@@ -80,6 +80,6 @@ const movieSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-});
+}, { versionKey: false });
 
 module.exports = mongoose.model('movie', movieSchema);

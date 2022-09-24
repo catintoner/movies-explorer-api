@@ -7,6 +7,8 @@ const User = require('../models/user');
 const {
   JWT,
   isProduction,
+  CREATED_CODE,
+  OK,
 } = require('../utils/constants');
 
 module.exports.createUser = (req, res, next) => {
@@ -20,7 +22,7 @@ module.exports.createUser = (req, res, next) => {
         .then((userInfo) => {
           const user = userInfo.toObject();
           delete user.password;
-          res.status(201).send(user);
+          res.status(CREATED_CODE).send(user);
         })
 
         .catch(next);
@@ -47,7 +49,7 @@ module.exports.login = (req, res, next) => {
         maxAge: 3600000 * 24 * 7,
         httpOnly: true,
         secure: isProduction,
-      }).status(200).send(user._id);
+      }).status(OK).send(user._id);
     })
 
     .catch(next);
@@ -56,7 +58,7 @@ module.exports.login = (req, res, next) => {
 module.exports.getUserInfo = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
-      res.status(200).send(user);
+      res.status(OK).send(user);
     })
 
     .catch(next);
@@ -70,7 +72,7 @@ module.exports.updateUserInfo = (req, res, next) => {
     runValidators: true,
   })
     .then((user) => {
-      res.status(200).send(user);
+      res.status(OK).send(user);
     })
 
     .catch(next);

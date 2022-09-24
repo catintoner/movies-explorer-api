@@ -8,8 +8,8 @@ const handleAuthError = () => {
 
 const extractBearerToken = (header) => header.replace('Bearer ', '');
 
-module.exports = (request, response, next) => {
-  const authorization = request.cookies.jwt;
+module.exports = (req, res, next) => {
+  const authorization = req.cookies.jwt;
   if (!authorization) {
     handleAuthError();
     return;
@@ -25,7 +25,7 @@ module.exports = (request, response, next) => {
     return;
   }
 
-  request.user = payload;
+  req.user = payload;
 
   next();
 };
