@@ -18,8 +18,9 @@ router.get('/signout', (req, res) => {
   res.clearCookie('jwt').status(OK).send({ message: 'Выход' });
 });
 
-router.use('/users', auth, userRouter);
-router.use('/movies', auth, movieRouter);
+router.use('/', auth);
+router.use('/users', userRouter);
+router.use('/movies', movieRouter);
 
 router.use('*', (req, res, next) => {
   next(new NotFoundError('Запрашиваемая страница не найдена'));
