@@ -12,7 +12,6 @@ const dataBaseUrl = isProduction ? DB_URL : 'mongodb://localhost:27017/moviesdb'
 
 const isValidityUrl = /^https?:\/\/(www\.)?[\w\d]*\.([\S\w._~:?#[\]@!$&'()*+,;=\-/])*#?$/;
 
-const OK = 200;
 const CREATED_CODE = 201;
 const SERVER_ERROR = 500;
 
@@ -30,7 +29,6 @@ module.exports = {
   JWT,
   SERVER_PORT,
   isValidityUrl,
-  OK,
   CREATED_CODE,
   SERVER_ERROR,
   DEFAULT_ALLOWED_METHODS,

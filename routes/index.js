@@ -10,12 +10,10 @@ const movieRouter = require('./movies');
 
 const NotFoundError = require('../errors/NotFoundError');
 
-const { OK } = require('../utils/constants');
-
 router.post('/signup', validateUserCreation, createUser);
 router.post('/signin', validateLogin, login);
 router.get('/signout', (req, res) => {
-  res.clearCookie('jwt').status(OK).send({ message: 'Выход' });
+  res.clearCookie('jwt').send({ message: 'Выход' });
 });
 
 router.use('/', auth);

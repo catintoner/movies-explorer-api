@@ -1,16 +1,16 @@
 const Movie = require('../models/movie');
 
-const { OK, CREATED_CODE } = require('../utils/constants');
+const { CREATED_CODE } = require('../utils/constants');
 
 const ValidateError = require('../errors/ValidateError');
-const DeleteForeignMovie = require('../errors/DeleteForeignMovie');
+const ForbiddenError = require('../errors/ForbiddenError');
 const NotFoundError = require('../errors/NotFoundError');
 
 module.exports.getMovies = (req, res, next) => {
   const userId = req.user._id;
   Movie.find({ owner: userId })
     .then((movies) => {
-      res.status(OK).send(movies);
+      res.send(movies);
     })
 
     .catch(next);
@@ -70,12 +70,12 @@ module.exports.deleteMovie = (req, res, next) => {
       if (ownerId === req.user._id) {
         Movie.findByIdAndDelete(movie)
           .then(() => {
-            res.status(OK).send({ message: 'Фильм удален из избранных' });
+            res.send({ message: 'Фильм удален из избранных' });
           })
 
           .catch(next);
       } else {
-        throw new DeleteForeignMovie('Нет прав для удаления фильма');
+        throw new ForbiddenError('Нет прав для удаления фильма');
       }
     })
 
