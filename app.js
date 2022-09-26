@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const { errors } = require('celebrate');
+const helmet = require('helmet');
 
 const router = require('./routes/index');
 
@@ -17,6 +18,8 @@ const { SERVER_PORT, dataBaseUrl } = require('./utils/constants');
 const centralHandlerErrors = require('./utils/centralHandlerErrors');
 
 const app = express();
+
+app.use(helmet());
 
 mongoose.connect(dataBaseUrl, {
   useNewUrlParser: true,
