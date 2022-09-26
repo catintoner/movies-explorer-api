@@ -13,12 +13,12 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 const cors = require('./middlewares/cors');
 const limiter = require('./middlewares/rateLimiter');
 
-const { SERVER_PORT } = require('./utils/constants');
+const { SERVER_PORT, dataBaseUrl } = require('./utils/constants');
 const centralHandlerErrors = require('./utils/centralHandlerErrors');
 
 const app = express();
 
-mongoose.connect('mongodb://localhost:27017/bitfilmsdb', {
+mongoose.connect(dataBaseUrl, {
   useNewUrlParser: true,
 });
 
