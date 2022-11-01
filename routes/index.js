@@ -13,7 +13,11 @@ const NotFoundError = require('../errors/NotFoundError');
 router.post('/signup', validateUserCreation, createUser);
 router.post('/signin', validateLogin, login);
 router.get('/signout', (req, res) => {
-  res.clearCookie('jwt').send({ message: 'Выход' });
+  res.clearCookie('jwt', {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none',
+  }).send({ message: 'Выход' });
 });
 
 router.use('/', auth);
